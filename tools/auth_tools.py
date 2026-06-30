@@ -1,19 +1,8 @@
-import httpx
-
-from config import API_BASE_URL
-
 from fastmcp import FastMCP
 
-from session import session
+from api_client import ExpenseApi
 
 mcp = FastMCP()
-
-@mcp.tool()
-async def login(email:str, password: str):
-    
-
-        
-    
 
 @mcp.tool()
 async def sign_up(
@@ -21,74 +10,21 @@ async def sign_up(
     email: str,
     password: str
 ):
+    
+    api = ExpenseApi()
+    return await api.sign_up_user(name, email, password)
 
-    async with httpx.AsyncClient() as client:
-
-        res = await client.post(
-            f"{API_BASE_URL}/auth/sign-up/email",
-            json={
-                "name": name,
-                "email": email,
-                "password": password
-            }
-        )
-
-        res.raise_for_status
-
-        data = res.json()
-        session.token = data["token"]
-        session.user = data["user"]
-
-        return {
-            "message": "use signup success..",
-            "user": data["user"]
-        }
-
+@mcp.tool()
+async def login(email:str, password: str):
+    api = ExpenseApi()
+    return api.signin_user(email, password)
 
 @mcp.tool()
 async def whoami():
-    if not session.token :
-        return {
-            "message" : "not authenticated "
-        }
-    
-    async with httpx.AsyncClient() as client:
-        res = await client.get(
-            f"{API_BASE_URL}/auth/get-session",
-            headers={
-                "Authorization":
-                f"Bearer {session.token}"
-            }
-        )
-
-        res.raise_for_status
-        return res.json()
+    api = ExpenseApi()
+    return api.whoami()
 
 @mcp.tool()
 async def logout(): 
-    if not session.token:
-        raise Exception(
-            "no user logged in"
-        )
-    
-    async with httpx.AsyncClient() as client:
-
-        res = await client.post(
-            f"{API_BASE_URL}/auth/sign-out",
-            headers={
-                "Authorization": f"Bearer {session.token}"
-            }
-        )
-
-        session.token = null
-        session.user = null
-
-        return "Logged out successfully.."
-
-
-# @mcp.tool()
-# async def sign_out(){
-#     async with httpx.AsyncClient() as client:
-    
-#     res = await client.post()
-# }
+    api = ExpenseApi()
+    return api.logout()
