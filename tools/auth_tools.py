@@ -13,7 +13,7 @@ async def login(email:str, password: str):
     async with httpx.AsyncClient() as client:
 
         res = await client.post(
-            f"{API_BASE_URL}/api/auth/sign-in/email",
+            f"{API_BASE_URL}/auth/sign-in/email",
             json={
                 "email": email,
                 "password": password
@@ -47,7 +47,7 @@ async def sign_up(
     async with httpx.AsyncClient() as client:
 
         res = await client.post(
-            f"{API_BASE_URL}/api/auth/sign-up/email",
+            f"{API_BASE_URL}/auth/sign-up/email",
             json={
                 "name": name,
                 "email": email,
@@ -75,8 +75,37 @@ async def whoami():
         }
     
     async with httpx.AsyncClient() as client:
-        res = await client.get()
+        res = await client.get(
+            f"{API_BASE_URL}/auth/get-session",
+            headers={
+                "Authorization":
+                f"Bearer {session.token}"
+            }
+        )
+
+        res.raise_for_status
+        return res.json()
+
+@mcp.tool()
+async def logout(): 
+    if not session.token:
+        raise Exception(
+            "no user logged in"
+        )
     
+    async with httpx.AsyncClient() as client:
+
+        res = await client.post(
+            f"{API_BASE_URL}/auth/sign-out",
+            headers={
+                "Authorization": f"Bearer {session.token}"
+            }
+        )
+
+        session.token = null
+        session.user = null
+
+        return "Logged out successfully.."
 
 
 # @mcp.tool()
