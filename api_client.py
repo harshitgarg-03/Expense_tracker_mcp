@@ -23,7 +23,7 @@ class ExpenseApi:
 
         return res.json()
     
-    async def post(self, path: str, data: dict, ):
+    async def close(self, path: str, data: dict, ):
         await self.client.aclose()
 
     async def get_expense(self):
@@ -44,7 +44,6 @@ class ExpenseApi:
                 }
 
             raise
-
 
     async def add_expense(self):
         res = await self.client.post("/api/transaction")
