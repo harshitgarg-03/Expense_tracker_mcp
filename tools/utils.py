@@ -8,4 +8,4 @@ def get_api():
             "please login first "
         )
     
-    return ExpenseApi(session.token)
+    return ExpenseApi(session.token) 
