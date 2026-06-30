@@ -4,6 +4,8 @@ from config import API_BASE_URL
 
 from fastmcp import FastMCP
 
+from session import session
+
 mcp = FastMCP()
 
 @mcp.tool()
@@ -22,18 +24,16 @@ async def login(email:str, password: str):
             return {
                 "error": "Invalid credentials"
             }
-        
+        res.raise_for_status
+
         data = res.json()
 
-        token = data.get("token")
-
-        if not token:
-            return {
-                "error": "No token returned by server"
-            }
+        session.token = data["token"]
+        session.user = data["user"]
         
         return {
-            "message": "Successfully logged in"
+            "message": "Successfully logged in",
+            "user": data["user"]
         }
     
 
@@ -55,7 +55,16 @@ async def sign_up(
             }
         )
 
-        return res.json()
+        res.raise_for_status
+
+        data = res.json()
+        session.token = data["token"]
+        session.user = data["user"]
+
+        return {
+            "message": "use signup success..",
+            "user": data["user"]
+        }
 
 
 # @mcp.tool()
