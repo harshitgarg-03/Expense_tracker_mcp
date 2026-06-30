@@ -1,0 +1,6 @@
+fastapi
+fastmcp
+httpx
+python-dotenv
+pyjwt
+uvicorn
