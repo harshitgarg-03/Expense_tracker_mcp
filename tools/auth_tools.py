@@ -10,31 +10,9 @@ mcp = FastMCP()
 
 @mcp.tool()
 async def login(email:str, password: str):
-    async with httpx.AsyncClient() as client:
+    
 
-        res = await client.post(
-            f"{API_BASE_URL}/auth/sign-in/email",
-            json={
-                "email": email,
-                "password": password
-            }
-        )
-
-        if res.status_code != 200:
-            return {
-                "error": "Invalid credentials"
-            }
-        res.raise_for_status
-
-        data = res.json()
-
-        session.token = data["token"]
-        session.user = data["user"]
         
-        return {
-            "message": "Successfully logged in",
-            "user": data["user"]
-        }
     
 
 @mcp.tool()
