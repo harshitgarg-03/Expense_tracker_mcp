@@ -67,6 +67,18 @@ async def sign_up(
         }
 
 
+@mcp.tool()
+async def whoami():
+    if not session.token :
+        return {
+            "message" : "not authenticated "
+        }
+    
+    async with httpx.AsyncClient() as client:
+        res = await client.get()
+    
+
+
 # @mcp.tool()
 # async def sign_out(){
 #     async with httpx.AsyncClient() as client:
