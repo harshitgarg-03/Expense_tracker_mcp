@@ -58,9 +58,9 @@ async def sign_up(
         return res.json()
 
 
-@mcp.tool()
-async def sign_out(){
-    async with httpx.AsyncClient() as client:
+# @mcp.tool()
+# async def sign_out(){
+#     async with httpx.AsyncClient() as client:
     
-    res = await client.post()
-}
+#     res = await client.post()
+# }

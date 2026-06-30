@@ -11,6 +11,21 @@ class ExpenseApi:
             }
         )
 
+    async def get(self, path: str):
+        res = await self.client.get(path)
+        res.raise_for_status()
+
+        return res.json()
+    
+    async def post(self, path: str, data: dict, ):
+        res = await self.client.get(path, json = data)
+        res.raise_for_status()
+
+        return res.json()
+    
+    async def post(self, path: str, data: dict, ):
+        await self.client.aclose()
+
     async def get_expense(self):
 
         try:

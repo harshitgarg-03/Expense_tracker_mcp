@@ -7,3 +7,4 @@ class SessionStore :
         self.user = null
 
         
+session = SessionStore()
