@@ -4,14 +4,25 @@ from session import session
 
 
 class ExpenseApi:
-    def __inti__ (self, token: str):
+    def __init__ (self, token: str | None = None):
+
+        headers = {}
+
+        if token:
+            headers["Authorization"] = f"Bearer {token}"
+
         self.client = httpx.AsyncClient(
             base_url=API_BASE_URL,
             timeout=30,
-            headers={
-                "Authorization": f"Bearer {token}"
-            }
+            headers= headers
         )
+
+    async def close(self):
+        await self.client.aclose()
+
+
+# ---------------------->>>>>>  GENERIC METHODS  <<<<---------------------
+
 
     async def get(self, path: str):
         res = await self.client.get(path)
@@ -20,13 +31,13 @@ class ExpenseApi:
         return res.json()
     
     async def post(self, path: str, data: dict, ):
-        res = await self.client.get(path, json = data)
+        res = await self.client.post(path, json = data)
         res.raise_for_status()
 
         return res.json()
     
-    async def close(self, path: str, data: dict, ):
-        await self.client.aclose()
+# ---------------------->>>>>>  AUTH SERVICES <<<<---------------------
+ 
 
     async def sign_up_user(
     self,
@@ -44,7 +55,7 @@ class ExpenseApi:
             }
         )
 
-        res.raise_for_status
+        res.raise_for_status()
 
         data = res.json()
         session.token = data["token"]
@@ -68,7 +79,7 @@ class ExpenseApi:
             return {
                 "error": "Invalid credentials"
             }
-        res.raise_for_status
+        res.raise_for_status()
 
         data = res.json()
 
@@ -94,7 +105,7 @@ class ExpenseApi:
             }
         )
 
-        res.raise_for_status
+        res.raise_for_status()
         return res.json()
     
     async def logout(self): 
@@ -110,10 +121,14 @@ class ExpenseApi:
             }
         )
 
-        session.token = null
-        session.user = null
+        session.token = None
+        session.user = None
 
         return "Logged out successfully.."
+
+
+# ---------------------->>>>>>  EXPENSE SERVICES <<<<---------------------
+
 
     async def get_expense(self):
 
