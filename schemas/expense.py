@@ -19,7 +19,7 @@ class Expense_Create(BaseModel):
                         "Freelance",
                         "Other"]
     
-    type: Literal["income", "expense"]
+    type: Literal["INCOME", "EXPENSE"]
     note: str | None = None
 
 
