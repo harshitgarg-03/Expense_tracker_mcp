@@ -5,17 +5,15 @@ from schemas.expense import ExpenseCreate
 
 
 class ExpenseApi:
-    def __init__ (self, token: str | None = None):
-
+    def __init__(self, token: str | None = None):
         headers = {}
-
         if token:
             headers["Authorization"] = f"Bearer {token}"
 
         self.client = httpx.AsyncClient(
             base_url=API_BASE_URL,
             timeout=30,
-            headers= headers
+            headers=headers
         )
 
     async def close(self):
@@ -28,27 +26,21 @@ class ExpenseApi:
     async def get(self, path: str):
         res = await self.client.get(path)
         res.raise_for_status()
-
         return res.json()
     
     async def post(self, path: str, data: dict):
-        res = await self.client.post(path, json = data)
+        res = await self.client.post(path, json=data)
         res.raise_for_status()
-
         return res.json()
     
     async def put(self, path: str, data: dict):
         res = await self.client.put(path, json=data)
-
         res.raise_for_status()
-
         return res.json()
     
     async def delete(self, path: str):
         res = await self.client.delete(path)
-
         res.raise_for_status()
-
         return res.json()
 
 
@@ -56,32 +48,33 @@ class ExpenseApi:
  
 
     async def sign_up_user(
-    self,
-    name: str,
-    email: str,
-    password: str
-):
-
+        self,
+        name: str,
+        email: str,
+        password: str
+    ):
         res = await self.client.post(
-            f"auth/sign-up/email",
+            "auth/sign-up/email",
             json={
                 "name": name,
                 "email": email,
                 "password": password
             }
         )
+        res.raise_for_status()
+        data = res.json()
 
-        session.token = res["token"]
-        session.user = res["user"]
+        session.token = data.get("token")
+        session.user = data.get("user")
 
         return {
             "message": "user signup success..",
-            "user": res["user"]
+            "user": session.user
         }
 
     async def signin_user(self, email: str, password: str):
         res = await self.client.post(
-            f"auth/sign-in/email",
+            "auth/sign-in/email",
             json={
                 "email": email,
                 "password": password
@@ -93,27 +86,29 @@ class ExpenseApi:
                 "error": "Invalid credentials"
             }
 
-        session.token = res["token"]
-        session.user = res["user"]
+        data = res.json()
+        session.token = data.get("token")
+        session.user = data.get("user")
         
         return {
             "message": "Successfully logged in",
-            "user": res["user"]
+            "user": session.user
         }
     
     async def whoami(self):
-        if not session.token :
+        if not session.token:
             return {
-                "message" : "not authenticated "
+                "message": "not authenticated"
             }
         
-        return await self.client.get(
-            f"auth/get-session",
+        res = await self.client.get(
+            "auth/get-session",
             headers={
-                "Authorization":
-                f"Bearer {session.token}"
+                "Authorization": f"Bearer {session.token}"
             }
         )
+        res.raise_for_status()
+        return res.json()
     
     async def logout(self): 
         if not session.token:
@@ -121,12 +116,13 @@ class ExpenseApi:
                 "no user logged in"
             )
 
-        await self.client.post(
-            f"{API_BASE_URL}/auth/sign-out",
+        res = await self.client.post(
+            "auth/sign-out",
             headers={
                 "Authorization": f"Bearer {session.token}"
             }
         )
+        res.raise_for_status()
 
         session.token = None
         session.user = None
@@ -138,24 +134,21 @@ class ExpenseApi:
 
 
     async def get_expense(self):
-        return await self.client.get("/transaction")
+        res = await self.client.get("/transaction")
+        res.raise_for_status()
+        return res.json()
 
     async def add_expense(self, data: ExpenseCreate):
-        return await self.client.post("/transaction", json=data.model_dump(mode="json"))
+        res = await self.client.post("/transaction", json=data.model_dump(mode="json"))
+        res.raise_for_status()
+        return res.json()
 
     async def delete_expense(self, id: str):
-        return await self.client.delete("/transaction/{id}")
+        res = await self.client.delete(f"/transaction/{id}")
+        res.raise_for_status()
+        return res.json()
     
-    async def edit_expense(self, id:str, data: ExpenseCreate):
-        return await self.client.put("/transaction/{id}", json=data.model_dump(mode="json"))
-    
-    # async def get_budget(self):
-    #     res = await self.client.get("/budget")
-    #     res.raise_for_status()
-    #     return res.json()
-    
-    # async def get_analytics(self):
-    #     res = await self.client.get("/analytics")
-
+    async def edit_expense(self, id: str, data: ExpenseCreate):
+        res = await self.client.put(f"/transaction/{id}", json=data.model_dump(mode="json"))
         res.raise_for_status()
         return res.json()
