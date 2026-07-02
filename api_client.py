@@ -1,6 +1,7 @@
 import httpx
 from config import API_BASE_URL
 from session import session
+from schemas.expense import Expense_Create
 
 
 class ExpenseApi:
@@ -139,14 +140,14 @@ class ExpenseApi:
     async def get_expense(self):
         return await self.client.get("/transaction")
 
-    async def add_expense(self):
-        return await self.client.post("/transaction")
+    async def add_expense(self, data: Expense_Create):
+        return await self.client.post("/transaction", json=data.model_dump(mode="json"))
 
-    async def delete_expense(self):
+    async def delete_expense(self, id: str):
         return await self.client.delete("/transaction/{id}")
     
-    async def edit_expense(self):
-        return await self.client.put("/transaction/{id}")
+    async def edit_expense(self, id:str, data: Expense_Create):
+        return await self.client.put("/transaction/{id}", json=data.model_dump(mode="json"))
     
     # async def get_budget(self):
     #     res = await self.client.get("/budget")

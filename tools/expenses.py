@@ -14,12 +14,12 @@ async def list_expenses():
 @mcp.tool()
 async def add_expenses(expense: Expense_Create):
     api = get_api()
-    return await api.add_expense(expense.model_dump(mode="json"))
+    return await api.add_expense(expense)
 
 @mcp.tool()
 async def edit_expenses(id: str, expense: Expense_Create):
     api = get_api()
-    return await api.edit_expense(id, expense.model_dump(mode="json"))
+    return await api.edit_expense(id, expense)
 
 @mcp.tool()
 async def delete_expenses(id: str):
