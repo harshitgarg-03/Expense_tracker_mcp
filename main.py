@@ -84,21 +84,6 @@ app.mount("/mcp", mcp.http_app())
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # import random
 # from fastmcp import FastMCP
 
