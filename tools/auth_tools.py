@@ -27,7 +27,9 @@ async def login(email: str, password: str):
 )
 async def whoami():
     api = ExpenseApi()
-    return await api.whoami()
+    res = await api.whoami()
+
+    return res
 
 @mcp.tool(
     name="logout",

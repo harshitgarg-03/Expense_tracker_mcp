@@ -62,14 +62,14 @@ class ExpenseApi:
             }
         )
         res.raise_for_status()
-        data = res.json()
+        # data = res.json()
 
-        session.token = data.get("token")
-        session.user = data.get("user")
+        # session.token = data.get("token")
+        # session.user = data.get("user")
 
         return {
             "message": "user signup success..",
-            "user": session.user
+            # "user": session.user
         }
 
     async def signin_user(self, email: str, password: str):
@@ -87,29 +87,32 @@ class ExpenseApi:
             }
 
         data = res.json()
-        session.token = data.get("token")
+        cookiedata = res.headers.get("set-cookie")
+        session.token =  cookiedata.split(";")[0].split("=")[1]
         session.user = data.get("user")
         
         return {
             "message": "Successfully logged in",
-            "user": session.user
+            "user": session.token
         }
     
     async def whoami(self):
-        if not session.token:
-            return {
-                "message": "not authenticated"
-            }
-        
+
         res = await self.client.get(
-            "auth/get-session",
+            "/api/auth/get-session",
             headers={
-                "Authorization": f"Bearer {session.token}"
+                "Cookie": session.token
             }
         )
-        res.raise_for_status()
-        return res.json()
-    
+
+        try:
+            print("JSON:", res.json(), flush=True)
+        except Exception as e:
+            print("JSON ERROR:", e, flush=True)
+
+        return {"done": True}
+
+
     async def logout(self): 
         if not session.token:
             raise Exception(
