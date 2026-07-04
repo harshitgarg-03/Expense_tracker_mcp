@@ -6,9 +6,13 @@ from schemas.expense import ExpenseCreate
 
 class ExpenseApi:
     def __init__(self, token: str | None = None):
+        if token is None:
+            token = session.token
+
         headers = {}
         if token:
-            headers["Authorization"] = f"Bearer {token}"
+            cookie_name = getattr(session, "cookie_name", None) or "session_token"
+            headers["Cookie"] = f"{cookie_name}={token}"
 
         self.client = httpx.AsyncClient(
             base_url=API_BASE_URL,
@@ -62,14 +66,38 @@ class ExpenseApi:
             }
         )
         res.raise_for_status()
-        # data = res.json()
+        data = res.json()
 
-        # session.token = data.get("token")
-        # session.user = data.get("user")
+        # Parse session cookie dynamically
+        session_cookie_name = "session_token"
+        session_cookie_value = None
+
+        # Try parsing from response cookies
+        for name_key, val in res.cookies.items():
+            if "session_token" in name_key or "better-auth" in name_key:
+                session_cookie_name = name_key
+                session_cookie_value = val
+                break
+
+        # Fallback to manual header parsing
+        if not session_cookie_value:
+            cookie_header = res.headers.get("set-cookie", "")
+            if cookie_header:
+                parts = cookie_header.split(";")[0].split("=", 1)
+                if len(parts) == 2:
+                    name_key = parts[0].strip()
+                    if "session_token" in name_key or "better-auth" in name_key:
+                        session_cookie_name = name_key
+                        session_cookie_value = parts[1].strip()
+
+        if session_cookie_value:
+            session.cookie_name = session_cookie_name
+            session.token = session_cookie_value
+            session.user = data.get("user")
 
         return {
             "message": "user signup success..",
-            # "user": session.user
+            "user": session.user
         }
 
     async def signin_user(self, email: str, password: str):
@@ -87,31 +115,59 @@ class ExpenseApi:
             }
 
         data = res.json()
-        cookiedata = res.headers.get("set-cookie")
-        session.token =  cookiedata.split(";")[0].split("=")[1]
-        session.user = data.get("user")
+        
+        # Parse session cookie dynamically
+        session_cookie_name = "session_token"
+        session_cookie_value = None
+
+        # Try parsing from response cookies
+        for name_key, val in res.cookies.items():
+            if "session_token" in name_key or "better-auth" in name_key:
+                session_cookie_name = name_key
+                session_cookie_value = val
+                break
+
+        # Fallback to manual header parsing
+        if not session_cookie_value:
+            cookie_header = res.headers.get("set-cookie", "")
+            if cookie_header:
+                parts = cookie_header.split(";")[0].split("=", 1)
+                if len(parts) == 2:
+                    name_key = parts[0].strip()
+                    if "session_token" in name_key or "better-auth" in name_key:
+                        session_cookie_name = name_key
+                        session_cookie_value = parts[1].strip()
+
+        if session_cookie_value:
+            session.cookie_name = session_cookie_name
+            session.token = session_cookie_value
+            session.user = data.get("user")
         
         return {
             "message": "Successfully logged in",
-            "user": session.token
+            "user": session.user,
+            "token": session.token
         }
     
     async def whoami(self):
 
-        res = await self.client.get(
-            "/api/auth/get-session",
-            headers={
-                "Cookie": session.token
-            }
-        )
+        if not session.token:
+            return {"error": "Not logged in"}
 
-        try:
-            print("JSON:", res.json(), flush=True)
-        except Exception as e:
-            print("JSON ERROR:", e, flush=True)
+        headers = {}
 
-        return {"done": True}
+        if session.token:
+            headers["Cookie"] = (
+                f"{session.cookie_name}={session.token}"
+            )
 
+        res = await self.client.get("/api/auth/get-session", headers=headers)
+        
+        return {
+            # "cookie_sent": headers.get("Cookie"),
+            "status": res.status_code,
+            # "body": res.text
+        }
 
     async def logout(self): 
         if not session.token:
@@ -119,15 +175,11 @@ class ExpenseApi:
                 "no user logged in"
             )
 
-        res = await self.client.post(
-            "auth/sign-out",
-            headers={
-                "Authorization": f"Bearer {session.token}"
-            }
-        )
+        res = await self.client.post("auth/sign-out")
         res.raise_for_status()
 
         session.token = None
+        session.cookie_name = None
         session.user = None
 
         return "Logged out successfully.."
