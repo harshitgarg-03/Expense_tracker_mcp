@@ -12,7 +12,7 @@ class ExpenseCreate(BaseModel):
         min_length=1
     )
 
-    amount: Decimal = Field(
+    amount: float = Field(
         ...,
         gt=0,
         description="Transaction amount"
