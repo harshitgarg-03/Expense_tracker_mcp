@@ -1,26 +1,28 @@
 from datetime import datetime
-from decimal import Decimal
 from typing import Literal
 
 from pydantic import BaseModel, Field
 
 
-class ExpenseCreate(BaseModel):
+class TransactionSchema(BaseModel):
+    id: str | None = None
 
-    title: str = Field(
-        ...,
-        min_length=1
+    title: str | None = Field(
+        default=None,
+        min_length=1,
+        max_length=100,
     )
 
-    amount: float = Field(
-        ...,
+    amount: float | None = Field(
+        default=None,
         gt=0,
-        description="Transaction amount"
+        description="Transaction amount",
     )
 
-    date: datetime = Field(
-        default_factory=datetime.now
-    )
+    type: Literal[
+        "INCOME",
+        "EXPENSE",
+    ] | None = None
 
     category: Literal[
         "Food",
@@ -32,11 +34,17 @@ class ExpenseCreate(BaseModel):
         "Salary",
         "Freelance",
         "Other",
-    ]
+    ] | None = None
 
-    type: Literal[
-        "INCOME",
-        "EXPENSE",
-    ]
+    note: str | None = Field(
+        default=None,
+        max_length=500,
+    )
 
-    note: str | None = None
+    userId: str | None = None
+
+    date: datetime | None = None
+
+    createdAt: datetime | None = None
+
+    updatedAt: datetime | None = None
