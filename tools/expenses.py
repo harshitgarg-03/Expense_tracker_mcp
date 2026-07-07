@@ -16,7 +16,15 @@ async def list_expenses():
 )
 async def add_expense(expense: ExpenseCreate):
     api = get_api()
-    return await api.add_expense(expense)
+    result = await api.add_expense(expense)
+    return (
+        f"Expense added successfully.\n"
+        f"ID: {result['id']}\n"
+        f"Title: {result['title']}\n"
+        f"Amount: ₹{result['amount']}\n"
+        f"Category: {result['category']}\n"
+        f"Type: {result['type']}"
+    )
 
 @mcp.tool(
     name="edit_expense",
