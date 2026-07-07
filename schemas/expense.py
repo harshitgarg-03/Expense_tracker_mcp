@@ -1,10 +1,11 @@
-from datetime import datetime
+from datetime import datetime, date as Date
+
 from typing import Literal
 
 from pydantic import BaseModel, Field
 
 
-class TransactionSchema(BaseModel):
+class ExpenseCreate(BaseModel):
     id: str | None = None
 
     title: str | None = Field(
@@ -43,7 +44,7 @@ class TransactionSchema(BaseModel):
 
     userId: str | None = None
 
-    date: datetime | None = None
+    date: Date | None = Field(default_factory=Date.today)
 
     createdAt: datetime | None = None
 
