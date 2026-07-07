@@ -101,6 +101,7 @@ class ExpenseApi:
         }
 
     async def signin_user(self, email: str, password: str):
+        print("called login func ..........")
         res = await self.client.post(
             "auth/sign-in/email",
             json={
