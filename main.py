@@ -10,8 +10,20 @@ session.load()
 import tools.expenses
 import tools.auth_tools
 
+from fastapi.middleware.cors import CORSMiddleware
+
 mcp_app = mcp.http_app()
 app = FastAPI(lifespan=mcp_app.lifespan)
+
+# Add CORS middleware to allow MCP Inspector and other web applications to connect
+app.add_middleware(
+    CORSMiddleware,
+    allow_origin_regex="https?://.*",
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 @app.get("/")
 def home():
