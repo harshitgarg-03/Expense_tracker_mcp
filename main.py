@@ -1,10 +1,11 @@
 from fastapi import FastAPI
 from mcp_server import mcp
+from session import session
 
 # print( "https are :: " ,type(mcp.http_app()))
 
 # print("mcp methods : ", dir(mcp))
-
+session.load()
 # Import tools to trigger registration decorators on the shared mcp instance
 import tools.expenses
 import tools.auth_tools

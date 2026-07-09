@@ -17,7 +17,8 @@ class ExpenseApi:
         self.client = httpx.AsyncClient(
             base_url=API_BASE_URL,
             timeout=30,
-            headers=headers
+            headers=headers,
+            follow_redirects=True,
         )
 
     async def close(self):
@@ -143,6 +144,7 @@ class ExpenseApi:
             session.cookie_name = session_cookie_name
             session.token = session_cookie_value
             session.user = data.get("user")
+            session.save()
         
         return {
             "message": "Successfully logged in",
