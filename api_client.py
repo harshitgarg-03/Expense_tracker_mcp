@@ -177,10 +177,9 @@ class ExpenseApi:
             raise Exception(
                 "no user logged in"
             )
-
-        res = await self.client.post("auth/sign-out")
+        print("hello logout ")
+        res = await self.client.post("auth/sign-out", json={})
         res.raise_for_status()
-
         session.token = None
         session.cookie_name = None
         session.user = None
