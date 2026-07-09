@@ -22,8 +22,8 @@ class ExpenseCreate(BaseModel):
 
     type: Literal[
         "INCOME",
-        "EXPENSE",
-    ] | None = None
+        "EXPENSE"
+    ] = "EXPENSE"
 
     category: Literal[
         "Food",
@@ -34,8 +34,8 @@ class ExpenseCreate(BaseModel):
         "Health",
         "Salary",
         "Freelance",
-        "Other",
-    ] | None = None
+        "Other"
+    ] = "Other"
 
     note: str | None = Field(
         default=None,
