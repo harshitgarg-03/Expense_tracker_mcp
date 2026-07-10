@@ -70,31 +70,31 @@ class ExpenseApi:
         data = res.json()
 
         # Parse session cookie dynamically
-        session_cookie_name = "session_token"
-        session_cookie_value = None
+        # session_cookie_name = "session_token"
+        # session_cookie_value = None
 
         # Try parsing from response cookies
-        for name_key, val in res.cookies.items():
-            if "session_token" in name_key or "better-auth" in name_key:
-                session_cookie_name = name_key
-                session_cookie_value = val
-                break
+        # for name_key, val in res.cookies.items():
+        #     if "session_token" in name_key or "better-auth" in name_key:
+        #         session_cookie_name = name_key
+        #         session_cookie_value = val
+        #         break
 
         # Fallback to manual header parsing
-        if not session_cookie_value:
-            cookie_header = res.headers.get("set-cookie", "")
-            if cookie_header:
-                parts = cookie_header.split(";")[0].split("=", 1)
-                if len(parts) == 2:
-                    name_key = parts[0].strip()
-                    if "session_token" in name_key or "better-auth" in name_key:
-                        session_cookie_name = name_key
-                        session_cookie_value = parts[1].strip()
+        # if not session_cookie_value:
+        #     cookie_header = res.headers.get("set-cookie", "")
+        #     if cookie_header:
+        #         parts = cookie_header.split(";")[0].split("=", 1)
+        #         if len(parts) == 2:
+        #             name_key = parts[0].strip()
+        #             if "session_token" in name_key or "better-auth" in name_key:
+        #                 session_cookie_name = name_key
+        #                 session_cookie_value = parts[1].strip()
 
-        if session_cookie_value:
-            session.cookie_name = session_cookie_name
-            session.token = session_cookie_value
-            session.user = data.get("user")
+        # if session_cookie_value:
+        #     session.cookie_name = session_cookie_name
+        #     session.token = session_cookie_value
+        #     session.user = data.get("user")
 
         return {
             "message": "user signup success..",
@@ -144,7 +144,7 @@ class ExpenseApi:
             session.cookie_name = session_cookie_name
             session.token = session_cookie_value
             session.user = data.get("user")
-            session.save()
+            # session.save()
         
         return {
             "message": "Successfully logged in",
@@ -164,7 +164,7 @@ class ExpenseApi:
                 f"{session.cookie_name}={session.token}"
             )
 
-        res = await self.client.get("/api/auth/get-session", headers=headers)
+        res = await self.client.get("auth/get-session", headers=headers)
         
         return {
             # "cookie_sent": headers.get("Cookie"),
