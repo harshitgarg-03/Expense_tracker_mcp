@@ -4,7 +4,6 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
-
 class ExpenseCreate(BaseModel):
     id: str | None = None
 
