@@ -7,8 +7,11 @@ from session import session
 # print("mcp methods : ", dir(mcp))
 # session.load()
 # Import tools to trigger registration decorators on the shared mcp instance
-import tools.expenses
-import tools.auth_tools
+# import tools.expenses
+# import tools.auth_tools
+
+from tools.expenses2 import register_transaction_tools
+register_transaction_tools(mcp)
 
 from fastapi.middleware.cors import CORSMiddleware
 
