@@ -1,7 +1,25 @@
 from fastmcp import FastMCP
+from fastmcp.server.auth import RemoteAuthProvider
+from pydantic import AnyHttpUrl
+from config import BETTER_AUTH_URL, MCP_RESOURCE_URI
+from fastmcp.server.auth.providers.jwt import JWTVerifier
+
+
+token_verifier = JWTVerifier(
+    jwks_uri=f"{BETTER_AUTH_URL}/api/auth/jwks",
+    issuer=BETTER_AUTH_URL,
+    audience=MCP_RESOURCE_URI,
+)
+
+auth = RemoteAuthProvider(
+    token_verifier=token_verifier,
+    authorization_servers=[AnyHttpUrl(BETTER_AUTH_URL)],
+    base_url=MCP_RESOURCE_URI,
+)
 
 mcp = FastMCP(
     name="expense-tracker-mcp",
+    auth= auth,
     instructions="""
 You are an AI interface for the Expense Tracker application.
 
