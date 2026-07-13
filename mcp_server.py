@@ -1,19 +1,19 @@
 from fastmcp import FastMCP
 from fastmcp.server.auth import RemoteAuthProvider
 from pydantic import AnyHttpUrl
-from config import BETTER_AUTH_URL, MCP_RESOURCE_URI
+from config import API_BASE_URL, MCP_RESOURCE_URI
 from fastmcp.server.auth.providers.jwt import JWTVerifier
 
 
 token_verifier = JWTVerifier(
-    jwks_uri=f"{BETTER_AUTH_URL}/api/auth/jwks",
-    issuer=BETTER_AUTH_URL,
+    jwks_uri=f"{API_BASE_URL}/auth/jwks",
+    issuer=API_BASE_URL,
     audience=MCP_RESOURCE_URI,
 )
 
 auth = RemoteAuthProvider(
     token_verifier=token_verifier,
-    authorization_servers=[AnyHttpUrl(BETTER_AUTH_URL)],
+    authorization_servers=[AnyHttpUrl(API_BASE_URL)],
     base_url=MCP_RESOURCE_URI,
 )
 
