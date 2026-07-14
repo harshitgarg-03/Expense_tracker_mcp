@@ -63,11 +63,11 @@ async def fetch_and_rewrite_auth_metadata(request: Request):
         
     # Rewrite fields to use our local proxy paths
     metadata["issuer"] = f"{base_url}/api/auth"
-    metadata["authorization_endpoint"] = f"{base_url}/api/auth/oauth2/authorize"
-    metadata["token_endpoint"] = f"{base_url}/api/auth/oauth2/token"
-    metadata["userinfo_endpoint"] = f"{base_url}/api/auth/oauth2/userinfo"
-    metadata["jwks_uri"] = f"{base_url}/api/auth/oauth2/jwks"
-    metadata["registration_endpoint"] = f"{base_url}/api/auth/oauth2/register"
+    metadata["authorization_endpoint"] = f"{base_url}/api/auth/authorize"
+    metadata["token_endpoint"] = f"{base_url}/api/auth/token"
+    metadata["userinfo_endpoint"] = f"{base_url}/api/auth/userinfo"
+    metadata["jwks_uri"] = f"{base_url}/api/auth/jwks"
+    metadata["registration_endpoint"] = f"{base_url}/api/auth/register"
     
     return metadata
 
@@ -78,7 +78,7 @@ async def get_auth_metadata(request: Request):
     return await fetch_and_rewrite_auth_metadata(request)
 
 # 3. Proxy Routes to Remote Better Auth
-@app.api_route("/api/auth/oauth2/authorize", methods=["GET", "POST"])
+@app.api_route("/api/auth/authorize", methods=["GET", "POST"])
 async def proxy_authorize(request: Request):
     vercel_issuer = API_BASE_URL.replace("/api", "") if API_BASE_URL else "https://expense-tracker-orpin-nu-68.vercel.app"
     target_url = f"{vercel_issuer}/api/auth/mcp/authorize"
@@ -86,7 +86,7 @@ async def proxy_authorize(request: Request):
     redirect_url = f"{target_url}?{query_string}" if query_string else target_url
     return RedirectResponse(url=redirect_url, status_code=307)
 
-@app.post("/api/auth/oauth2/token")
+@app.post("/api/auth/token")
 async def proxy_token(request: Request):
     body = await request.body()
     headers = dict(request.headers)
@@ -113,7 +113,7 @@ async def proxy_token(request: Request):
         headers=response_headers
     )
 
-@app.post("/api/auth/oauth2/register")
+@app.post("/api/auth/register")
 async def proxy_register(request: Request):
     body = await request.body()
     headers = dict(request.headers)
@@ -140,7 +140,7 @@ async def proxy_register(request: Request):
         headers=response_headers
     )
 
-@app.get("/api/auth/oauth2/jwks")
+@app.get("/api/auth/jwks")
 async def proxy_jwks(request: Request):
     headers = dict(request.headers)
     headers.pop("host", None)
@@ -165,7 +165,7 @@ async def proxy_jwks(request: Request):
         headers=response_headers
     )
 
-@app.get("/api/auth/oauth2/userinfo")
+@app.get("/api/auth/userinfo")
 async def proxy_userinfo(request: Request):
     headers = dict(request.headers)
     headers.pop("host", None)
