@@ -22,5 +22,5 @@ def home():
     return {"message": "Server running"}
 
 # Expose MCP at /mcp by mounting
-app.mount("/mcp", mcp_app)
+app.mount("/", mcp_app)
 
