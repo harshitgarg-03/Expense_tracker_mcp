@@ -29,10 +29,9 @@ TransactionCategory = Literal[
 
 
 def _current_user_id() -> str:
-    """
-    Get the authenticated Better Auth user ID from
-    the OAuth access token.
-    """
+    """The JWT's `sub` claim is the SAME user.id Better Auth uses everywhere
+    else in the app — this is the whole trick. No lookup table, no mapping."""
+    
 
     token = get_access_token()
 
