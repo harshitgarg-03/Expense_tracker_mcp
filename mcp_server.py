@@ -15,17 +15,17 @@ jwks_uri = f"{issuer_url}/api/auth/jwks"
 
 token_verifier = JWTVerifier(
     jwks_uri=jwks_uri,
-    issuer=[issuer_url, f"{issuer_url}/api/auth"],
-    audience=None, # Set to None to support dynamic client registration client IDs
+    issuer=issuer_url,
+    audience=MCP_RESOURCE_URI, # Set to None to support dynamic client registration client IDs
 )
 
-# We want the client to query our FastAPI server (acting as the proxy/gateway) for authorization metadata.
-auth_server_base = MCP_RESOURCE_URI.rstrip("/") + "/api/auth"
+# # We want the client to query our FastAPI server (acting as the proxy/gateway) for authorization metadata.
+# auth_server_base = MCP_RESOURCE_URI/api/auth
 
 auth = RemoteAuthProvider(
     token_verifier=token_verifier,
-    authorization_servers=[AnyHttpUrl(auth_server_base)],
-    base_url=MCP_RESOURCE_URI.rstrip("/") + "/mcp",
+    authorization_servers=[AnyHttpUrl(API_BASE_URL)],
+    base_url=MCP_RESOURCE_URI,
 )
 
 mcp = FastMCP(
