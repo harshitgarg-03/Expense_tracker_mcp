@@ -1,6 +1,7 @@
 from fastapi.middleware.cors import CORSMiddleware
 from mcp_server import mcp
 from tools.expenses2 import register_transaction_tools
+from fastapi import FastAPI
 
 # Register transaction tools
 register_transaction_tools(mcp)
