@@ -14,6 +14,8 @@ token_verifier = JWTVerifier(
     audience=MCP_RESOURCE_URI,
 )
 
+
+print("JWKS UIS ::: " , jwks_uri)
 auth = RemoteAuthProvider(
     token_verifier=token_verifier,
     authorization_servers=[AnyHttpUrl(issuer_url)],
