@@ -6,13 +6,18 @@ from fastmcp.server.auth.providers.jwt import JWTVerifier
 
 issuer_url = API_BASE_URL.replace("/api", "") if API_BASE_URL else "https://expense-tracker-orpin-nu-68.vercel.app"
 
-jwks_uri = f"{issuer_url}/api/auth/jwks"
+jwks_uri = f"{issuer_url}/api/auth/mcp/jwks"
 
 token_verifier = JWTVerifier(
     jwks_uri=jwks_uri,
     issuer=issuer_url,
     audience=MCP_RESOURCE_URI,
 )
+
+print("OAuth issuer:", issuer_url)
+print("JWKS URI:", jwks_uri)
+print("Expected audience:", MCP_RESOURCE_URI)
+
 
 
 print("JWKS UIS ::: " , jwks_uri)
