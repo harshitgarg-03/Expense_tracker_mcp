@@ -1,26 +1,34 @@
 from fastmcp import FastMCP
 from fastmcp.server.auth import RemoteAuthProvider
 from pydantic import AnyHttpUrl
-from config import API_BASE_URL, MCP_RESOURCE_URI
-from fastmcp.server.auth.providers.jwt import JWTVerifier
+from config import API_BASE_URL, MCP_RESOURCE_URI, INTROSPECTION_CLIENT_ID, INTROSPECTION_CLIENT_SECRET
+from fastmcp.server.auth.providers.introspection import IntrospectionTokenVerifier
+# from fastmcp.server.auth.providers.jwt import JWTVerifier
 
 issuer_url = API_BASE_URL.replace("/api", "") if API_BASE_URL else "https://expense-tracker-orpin-nu-68.vercel.app"
 
 jwks_uri = f"{issuer_url}/api/auth/mcp/jwks"
 
-token_verifier = JWTVerifier(
-    jwks_uri=jwks_uri,
-    issuer=issuer_url,
-    audience=MCP_RESOURCE_URI,
+# token_verifier = JWTVerifier(
+#     jwks_uri=jwks_uri,
+#     issuer=issuer_url,
+#     audience=MCP_RESOURCE_URI,
+# )
+introspection_url = (
+    f"{issuer_url}/api/auth/mcp/introspect"
+)
+# print("OAuth issuer:", issuer_url)
+# print("JWKS URI:", jwks_uri)
+# print("Expected audience:", MCP_RESOURCE_URI)
+
+token_verifier = IntrospectionTokenVerifier(
+    introspection_url=introspection_url,
+    client_id=INTROSPECTION_CLIENT_ID,
+    client_secret=INTROSPECTION_CLIENT_SECRET,
+    required_scopes=["expenses:read", "expenses:write"],
 )
 
-print("OAuth issuer:", issuer_url)
-print("JWKS URI:", jwks_uri)
-print("Expected audience:", MCP_RESOURCE_URI)
-
-
-
-print("JWKS UIS ::: " , jwks_uri)
+# print("JWKS UIS ::: " , jwks_uri)
 auth = RemoteAuthProvider(
     token_verifier=token_verifier,
     authorization_servers=[AnyHttpUrl(issuer_url)],
