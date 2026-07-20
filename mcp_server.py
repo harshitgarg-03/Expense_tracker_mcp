@@ -5,6 +5,7 @@ from config import API_BASE_URL, MCP_RESOURCE_URI, INTROSPECTION_CLIENT_ID, INTR
 from fastmcp.server.auth.providers.introspection import IntrospectionTokenVerifier
 # from fastmcp.server.auth.providers.jwt import JWTVerifier
 
+print("api url :: ", API_BASE_URL)
 issuer_url = API_BASE_URL.replace("/api", "") if API_BASE_URL else "https://expense-tracker-orpin-nu-68.vercel.app"
 
 jwks_uri = f"{issuer_url}/api/auth/mcp/jwks"
