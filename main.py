@@ -2,13 +2,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from mcp_server import mcp
 from tools.expenses2 import register_transaction_tools
 from fastapi import FastAPI
+from config import API_BASE_URL
 
 # Register transaction tools
 register_transaction_tools(mcp)
 
 mcp_app = mcp.http_app()
 app = FastAPI(lifespan=mcp_app.lifespan)
-
+print("hello fatsmcp ", API_BASE_URL)
 # Add CORS middleware to allow MCP Inspector and other web applications to connect
 app.add_middleware(
     CORSMiddleware,
