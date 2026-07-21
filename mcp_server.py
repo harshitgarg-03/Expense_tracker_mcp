@@ -16,7 +16,7 @@ jwks_uri = f"{issuer_url}/api/auth/mcp/jwks"
 #     audience=MCP_RESOURCE_URI,
 # )
 introspection_url = (
-    f"{issuer_url}/api/auth/mcp/introspect"
+    f"{issuer_url}/oauth2/introspect"
 )
 # print("OAuth issuer:", issuer_url)
 # print("JWKS URI:", jwks_uri)
