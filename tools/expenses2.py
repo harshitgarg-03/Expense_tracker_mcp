@@ -92,9 +92,10 @@ def register_transaction_tools(mcp: FastMCP) -> None:
 
         row = await pool.fetchrow(
             """
-            INSERT INTO "Expense"
-            (title, amount, type, category, note, "userId", date)
-            VALUES ($1, $2, $3, $4, $5, $6, $7)
+            INSERT INTO "Transaction"
+                (id, title, amount, type, category, note, "userId", date, "createdAt", "updatedAt")
+            VALUES
+                (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, NOW(), NOW())
             RETURNING *
             """,
             title.strip(),
@@ -107,7 +108,6 @@ def register_transaction_tools(mcp: FastMCP) -> None:
         )
 
         return dict(row)
-
 
     @mcp.tool()
     async def update_transaction(
