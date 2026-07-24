@@ -51,18 +51,31 @@ def register_transaction_tools(mcp: FastMCP) -> None:
     @mcp.tool()
     async def list_recent_expenses() -> list[dict]:
         """List the authenticated user's most recent expenses."""
+
         user_id = _current_user_id()
         pool = await get_pool()
+
         rows = await pool.fetch(
             """
-            SELECT id, amount, category, description, created_at
-            FROM expenses
-            WHERE user_id = $1
-            ORDER BY created_at DESC
+            SELECT
+                id,
+                title,
+                amount,
+                type,
+                category,
+                note,
+                "userId",
+                date,
+                "createdAt"
+            FROM "Transaction"
+            WHERE "userId" = $1
+            AND type = 'EXPENSE'
+            ORDER BY "createdAt" DESC
             """,
             user_id,
         )
-        return [dict(r) for r in rows]
+
+        return [dict(row) for row in rows]
 
     @mcp.tool()
     async def add_transaction(
@@ -119,79 +132,76 @@ def register_transaction_tools(mcp: FastMCP) -> None:
         note: str | None = None,
         date: Date | None = None,
     ) -> dict:
-            """
-            Update an existing transaction.
+        """
+        Update an existing transaction.
 
-            Only provided fields are updated.
-            """
+        Only provided fields are updated.
+        """
 
-            user_id = _current_user_id()
+        user_id = _current_user_id()
 
-            if title is not None and not title.strip():
-                raise ToolError("Title cannot be empty")
+        if title is not None and not title.strip():
+            raise ToolError("Title cannot be empty")
 
-            if amount is not None and amount <= 0:
-                raise ToolError("Amount must be greater than zero")
+        if amount is not None and amount <= 0:
+            raise ToolError("Amount must be greater than zero")
 
-            updates = []
-            values = []
+        updates = []
+        values = []
 
-            if title is not None:
-                values.append(title.strip())
-                updates.append(f"title = ${len(values)}")
+        if title is not None:
+            values.append(title.strip())
+            updates.append(f"title = ${len(values)}")
 
-            if amount is not None:
-                values.append(amount)
-                updates.append(f"amount = ${len(values)}")
+        if amount is not None:
+            values.append(amount)
+            updates.append(f"amount = ${len(values)}")
 
-            if type is not None:
-                values.append(type)
-                updates.append(f"type = ${len(values)}")
+        if type is not None:
+            values.append(type)
+            updates.append(f"type = ${len(values)}")
 
-            if category is not None:
-                values.append(category)
-                updates.append(f"category = ${len(values)}")
+        if category is not None:
+            values.append(category)
+            updates.append(f"category = ${len(values)}")
 
-            if note is not None:
-                values.append(note)
-                updates.append(f"note = ${len(values)}")
+        if note is not None:
+            values.append(note)
+            updates.append(f"note = ${len(values)}")
 
-            if date is not None:
-                values.append(date)
-                updates.append(f"date = ${len(values)}")
+        if date is not None:
+            values.append(date)
+            updates.append(f"date = ${len(values)}")
 
-            if not updates:
-                raise ToolError("No fields provided to update")
+        if not updates:
+            raise ToolError("No fields provided to update")
 
-            updates.append('"updatedAt" = NOW()')
+        # Prisma @updatedAt equivalent
+        updates.append('"updatedAt" = NOW()')
 
-            values.append(transaction_id)
-            transaction_index = len(values)
+        values.append(transaction_id)
+        transaction_index = len(values)
 
-            values.append(user_id)
-            user_index = len(values)
+        values.append(user_id)
+        user_index = len(values)
 
-            query = f"""
-                UPDATE "Expense"
-                SET {", ".join(updates)}
-                WHERE id = ${transaction_index}
-                AND "userId" = ${user_index}
-                RETURNING *
-            """
+        query = f"""
+            UPDATE "Transaction"
+            SET {", ".join(updates)}
+            WHERE id = ${transaction_index}
+            AND "userId" = ${user_index}
+            RETURNING *
+        """
 
-            pool = await get_pool()
+        pool = await get_pool()
 
-            row = await pool.fetchrow(
-                query,
-                *values,
-            )
+        row = await pool.fetchrow(query, *values)
 
-            if row is None:
-                raise ToolError("Transaction not found")
+        if row is None:
+            raise ToolError("Transaction not found")
 
-            return dict(row)
+        return dict(row)
 
-    
     @mcp.tool()
     async def delete_transaction(
     transaction_id: str,
@@ -206,7 +216,7 @@ def register_transaction_tools(mcp: FastMCP) -> None:
 
         row = await pool.fetchrow(
             """
-            DELETE FROM "Expense"
+            DELETE FROM "Transaction"
             WHERE id = $1
             AND "userId" = $2
             RETURNING *
